@@ -1,0 +1,3 @@
+smartx\web\portal\service\impl\UserServiceTest.class
+smartx\web\portal\service\impl\VehicleServiceTest.class
+smartx\web\portal\utils\PassEncodingTest.class

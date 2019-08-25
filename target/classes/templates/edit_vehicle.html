@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport"
+		content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta name="description" content="SmartX | Edit Vehicle">
+	<meta name="author" content="TTS4 development team">
+	<title>SmartX | Edit Vehicle</title>
+	<div th:replace="fragments/header :: header-css"></div>
+</head>
+
+<body onload="checkCookie()" class="animsition">
+	<div class="page-wrapper">
+		<div th:replace="fragments/mobile_menu :: mobile_menu"></div>
+		<div th:replace="fragments/menu_sidebar :: menu_sidebar"></div>
+
+		<!-- PAGE CONTAINER-->
+		<div class="page-container">
+			<div th:replace="fragments/topbar :: topbar"></div>
+
+			<!-- MAIN CONTENT-->
+			<div class="main-content">
+				<div class="section__content section__content--p30">
+					<form th:object="${editedVehicle}"
+						th:action="@{/vehicle/edit/{id}(id=${editedVehicle.id})}"
+						enctype="multipart/form-data" method="POST">
+						<div class="container-fluid">
+							<div class="row">
+								<div class="col-md-12">
+									<div class="overview-wrap">
+										<h2 class="title-2">Edit Vehicle Details</h2>
+									</div>
+								</div>
+							</div>
+							<div class="m-b-15"></div>
+							<div class="row">
+
+								<div class="col-lg-6">
+									<div class="card">
+										<div class="card-header">
+											<strong style="float: left;">About</strong>
+										</div>
+										<div class="card-body card-block">
+
+
+											<div class="form-group">
+												<label for="vat" class=" form-control-label">Vehicle
+													Number</label> <input type="text" th:value="*{vehicleNumber}"
+													th:field="*{vehicleNumber}" class="form-control"
+													maxlength="10" required>
+											</div>
+
+											<div class="form-group">
+												<label for="street" class=" form-control-label">VIN</label>
+
+												<div th:switch="${editedVehicle.status}">
+													<div th:case="'VIN MISMATCH'">
+														<input type="text" id="vin" th:value="*{vin}"
+															th:field="*{vin}" class="form-control" maxlength="18"
+															style="color: red;" required>
+													</div>
+													<div th:case="'NOT REGISTERED'">
+														<input type="text" id="vin" th:value="*{vin}"
+															th:field="*{vin}" class="form-control" maxlength="18"
+															required>
+													</div>
+													<div th:case="*">
+														<input type="text" id="vin" th:value="*{vin}"
+															class="form-control" maxlength="18" required disabled>
+													</div>
+												</div>
+											</div>
+
+											<div class="form-group">
+												<label for="street" class=" form-control-label">Vehicle
+													Model</label> <input type="text" th:value="*{vehicleModel}"
+													th:field="*{vehicleModel}" id="vehicleModel"
+													class="form-control">
+											</div>
+											<div class="form-group">
+												<label for="street" class=" form-control-label">Vehicle
+													Colour</label> <input type="text" th:value="*{vehicleColour}"
+													th:field="*{vehicleColour}" id="vehicleColour"
+													class="form-control">
+											</div>
+											<div class="form-group">
+												<label for="street" class=" form-control-label">Device
+													Serial Number</label> <input type="text"
+													th:value="*{deviceSerialNumber}" id="deviceSerialNumber"
+													class="form-control" required disabled>
+											</div>
+
+
+										</div>
+									</div>
+								</div>
+
+								<div class="col-lg-6">
+									<div class="card" style="height: 254px;">
+										<div class="card-header">
+											<strong>Vehicle Image</strong>
+											<button disabled type="button" class="btn-sm btn-link"
+												style="float: right;">&nbsp;</button>
+										</div>
+										<div class="card-body card-block" style="overflow: hidden;">
+											<div class="containerimg"
+												style="max-height: 100%; overflow: hidden; text-align: center;">
+												<img th:if="${vehicleImage != null}"
+													th:attr="src=@{'data:image/jpeg;base64,'+${vehicleImage}}"
+													alt="Vehicle image"
+													style="height: 99px; object-fit: cover;"> <img
+													th:if="${vehicleImage == null}"
+													src="/static/icons/backgroundvisual.jpg"
+													alt="Vehicle image"
+													style="height: 99px; object-fit: cover;">
+											</div>
+											<p>&nbsp;</p>
+											<div style="white-space: nowrap;">
+												<input type="button" class="btn btn-primary" id="get_file"
+													value="Choose File"> <input type="file"
+													id="my_file" name="vehicleImage" accept=".jpg">
+												<div id="customfileupload" style="pointer-events: none"></div>
+											</div>
+										</div>
+									</div>
+									<div class="card">
+										<div class="card-header">
+											<strong>Driver</strong>
+										</div>
+										<div class="card-body card-block">
+											<div th:if="${assignedDriver != null}">
+												<div class="alert alert-primary" role="alert"
+													style="overflow: hidden; white-space: nowrap;">
+													<strong> Corresponding Driver:&nbsp; <span
+														style="display: inline"
+														th:text="${assignedDriver.driverUsername}"></span>
+													</strong>
+												</div>
+											</div>
+											<div th:if="${assignedDriver == null}">
+												<div class="alert alert-primary" role="alert"
+													style="overflow: hidden; white-space: nowrap;">
+													<strong> Corresponding Driver:&nbsp; - </strong>
+												</div>
+											</div>
+											<div>
+												<label for="select" class=" form-control-label">&nbsp;
+													Change active driver?</label>
+											</div>
+											<tr class="spacer"></tr>
+											<div class="row form-group">
+												<div class="col-12 col-md-6">
+													<div th:if="${assignedDriver != null}">
+														<select class="form-control" name="selectedDriverId"
+															id="selectedDriverId">
+															<option value="0">No driver</option>
+															<option th:each="unassignedDriver : ${unassignedDrivers}"
+																th:value="${unassignedDriver.id}"
+																th:text="${unassignedDriver.driverUsername}"
+																th:selected="(${unassignedDriver.id} == ${selectedDriverId})"></option>
+														</select>
+													</div>
+
+													<div th:if="${assignedDriver == null}">
+														<select class="form-control" name="selectedDriverId"
+															id="selectedDriverId">
+															<option value="0">No driver</option>
+															<option th:each="unassignedDriver : ${unassignedDrivers}"
+																th:value="${unassignedDriver.id}"
+																th:text="${unassignedDriver.driverUsername}"></option>
+														</select>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="row">
+							<div class="col-md-12">
+								<div class="card">
+									<div class="card-header">
+										<strong>Vehicle Configuration</strong>
+									</div>
+									<div class="card-body card-block">
+										<div th:switch="${editedVehicle.status}">
+											<div th:case="'VIN MISMATCH'">
+												<p style="color: red; font-size: 110%;">Cannot update
+													configuration parameters unless correct VIN is provided</p>
+											</div>
+											<div th:case="'CONFIGURATION PENDING'">
+												<p style="color: red; font-size: 110%;">Cannot update
+													configuration parameters, waiting for vehicle calibration</p>
+											</div>
+											<div th:case="*">
+
+												<div th:object="${editedVehicleConfiguration}">
+
+													<div class="row form-group">
+														<div class="col col-md-2">
+															<label class=" form-control-label">Tire Condition</label>
+														</div>
+														<div class="col col-md-1">
+															<label class="switch switch-3d switch-primary mr-3">
+																<input type="checkbox" th:field="*{tireCondition}"
+																class="switch-input" checked="true"> <span
+																class="switch-label"></span> <span class="switch-handle"></span>
+															</label>
+														</div>
+														<div class="col col-md-9">
+															<label class=" form-control-label">The device
+																shall continuously monitor the tire pressure messages in
+																order to detect tire pressure alarm events.</label>
+														</div>
+													</div>
+
+													<div class="row form-group">
+														<div class="col col-md-2">
+															<label class=" form-control-label">Fuel
+																Consumption</label>
+														</div>
+														<div class="col col-md-1">
+															<label class="switch switch-3d switch-secondary mr-3">
+																<input type="checkbox" th:field="*{fuelConsumption}"
+																class="switch-input" checked="true"> <span
+																class="switch-label"></span> <span class="switch-handle"></span>
+															</label>
+														</div>
+														<div class="col col-md-9">
+															<label class=" form-control-label">The device
+																shall acquire, record and maintain the fuel consumption
+																value, as received on the vehicle bus interface.</label>
+														</div>
+													</div>
+
+													<div class="row form-group">
+														<div class="col col-md-2">
+															<label class=" form-control-label">DTC</label>
+														</div>
+														<div class="col col-md-1">
+															<label class="switch switch-3d switch-success mr-3">
+																<input type="checkbox" th:field="*{dtc}"
+																class="switch-input" checked="true"> <span
+																class="switch-label"></span> <span class="switch-handle"></span>
+															</label>
+														</div>
+														<div class="col col-md-9">
+															<label class=" form-control-label">Diagnostic
+																code is considered to be active whenever at least one of
+																Malfunction Indicator Lamp Status, Red Stop Lamp Status,
+																Amber Warning Lamp Status, Protect Lamp Status is On.</label>
+														</div>
+													</div>
+
+													<div class="row form-group">
+														<div class="col col-md-2">
+															<label class=" form-control-label">Over Speed</label>
+														</div>
+														<div class="col col-md-1">
+															<label class="switch switch-3d switch-warning mr-3">
+																<input type="checkbox" th:field="*{overSpeed}"
+																class="switch-input" checked="true"> <span
+																class="switch-label"></span> <span class="switch-handle"></span>
+															</label>
+														</div>
+														<div class="col col-md-9">
+															<label class=" form-control-label">When the
+																device detects that the vehicle speed acquired from the
+																vehicle bus interface is higher than the over speed
+																trigger an event shall be stored in the database.</label>
+														</div>
+													</div>
+
+													<div class="row form-group">
+														<div class="col col-md-2">
+															<label class=" form-control-label">Over RPM</label>
+														</div>
+														<div class="col col-md-1">
+															<label class="switch switch-3d switch-info mr-3">
+																<input type="checkbox" th:field="*{overRpm}"
+																class="switch-input" checked="true"> <span
+																class="switch-label"></span> <span class="switch-handle"></span>
+															</label>
+														</div>
+														<div class="col col-md-9">
+															<label class=" form-control-label">When the
+																device detects that the vehicle RPM acquired from the
+																vehicle interface is higher than the over RPM trigger an
+																event shall be stored in the database.</label>
+														</div>
+													</div>
+
+													<div class="row form-group">
+														<div class="col col-md-2">
+															<label class=" form-control-label">Harsh
+																Acceleration</label>
+														</div>
+														<div class="col col-md-1">
+															<label class="switch switch-3d switch-danger mr-3">
+																<input type="checkbox" th:field="*{harshAcceleration}"
+																class="switch-input" checked="true"> <span
+																class="switch-label"></span> <span class="switch-handle"></span>
+															</label>
+														</div>
+														<div class="col col-md-9">
+															<label class=" form-control-label">The device
+																shall calculate the vehicle acceleration based on the
+																vehicle speed data from two consecutive seconds. If the
+																calculate value is above the harsh acceleration limit an
+																event shall be stored in the database.</label>
+														</div>
+													</div>
+
+													<div class="row form-group">
+														<div class="col col-md-2">
+															<label class=" form-control-label">Harsh Breaking</label>
+														</div>
+														<div class="col col-md-1">
+															<label class="switch switch-3d switch-primary mr-3">
+																<input type="checkbox" th:field="*{harshBreak}"
+																class="switch-input" checked="true"> <span
+																class="switch-label"></span> <span class="switch-handle"></span>
+															</label>
+														</div>
+														<div class="col col-md-9">
+															<label class=" form-control-label">The device
+																shall calculate the vehicle acceleration based on the
+																vehicle speed data from two consecutive seconds. If the
+																calculate value is bellow the harsh braking an event
+																shall be stored in the database.</label>
+														</div>
+													</div>
+
+													<div class="row form-group">
+														<div class="col col-md-2">
+															<label class=" form-control-label">Online Report
+																Frequency</label>
+														</div>
+														<div class="col col-md-2">
+															<label style="width: 80px; height: 15px;"> <input
+																type="number" th:field="*{onlineFrequencyInterval}"
+																id="onlineRepFreq" placeholder="5-30" required
+																class="form-control" min="5" max="30"
+																oninput="if(this.value>30){this.value='30';}else if(this.value<5){this.value='5';}"
+																onkeydown="return false">
+															</label> <label for="onlineRepFreq"
+																class="pr-1  form-control-label">&nbsp; minutes</label>
+														</div>
+													</div>
+
+													<div class="row form-group">
+														<div class="col col-md-2">
+															<label for="textarea-input" class=" form-control-label">Description</label>
+														</div>
+														<div class="col col-md-3">
+															<textarea name="textarea-input" th:field="*{description}"
+																id="textarea-input" rows="5"
+																placeholder="Description..." class="form-control"></textarea>
+														</div>
+													</div>
+													<br>
+													<p style="color: red; font-size: 110%;">*NOTE: Any
+														changes made to the configuration parameters will trigger
+														a recalibration on the device side.</p>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-lg-12">
+								<input type="submit" class="btn-lg btn-primary"
+									value="Update Vehicle" style="float: right" />
+							</div>
+						</div>
+						<p>&nbsp;</p>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div th:replace="fragments/footer :: footer-scripts"></div>
+	<script>
+		document.getElementById('get_file').onclick = function() {
+			document.getElementById('my_file').click();
+		};
+		$('input[type=file]')
+				.change(
+						function(e) {
+							var fullPath = document.getElementById('my_file').value;
+							if (fullPath) {
+								var startIndex = (fullPath.indexOf('\\') >= 0 ? fullPath
+										.lastIndexOf('\\')
+										: fullPath.lastIndexOf('/'));
+								var filename = fullPath.substring(startIndex);
+								if (filename.indexOf('\\') === 0
+										|| filename.indexOf('/') === 0) {
+									filename = filename.substring(1);
+								}
+							}
+							$('#customfileupload').html(filename);
+						});
+	</script>
+</body>
+
+</html>
+<!-- end document-->

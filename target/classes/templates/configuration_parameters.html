@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta name="description" content="SmartX | Configuration Parameters">
+	<meta name="author" content="TTS4 development team">
+	<title>SmartX | Configuration Parameters</title>
+	<div th:replace="fragments/header :: header-css"></div>
+</head>
+
+<body onload="checkCookie()" class="animsition">
+	<div class="page-wrapper">
+		<div th:replace="fragments/mobile_menu :: mobile_menu"></div>
+		<div th:replace="fragments/menu_sidebar :: menu_sidebar"></div>
+
+		<!-- PAGE CONTAINER-->
+		<div class="page-container">
+			<div th:replace="fragments/topbar :: topbar"></div>
+
+			<!-- MAIN CONTENT-->
+			<div class="main-content">
+				<div class="section__content section__content--p30">
+					<div class="container-fluid">
+						<form th:object="${newVehicleConfiguration}"
+							th:action="@{/vehicle/add/configuration}" method="POST"
+							enctype="multipart/form-data" class="form">
+							<div class="row">
+								<div class="col-md-12">
+									<div class="overview-wrap">
+										<h2 class="title-2">Add Vehicle</h2>
+									</div>
+								</div>
+							</div>
+							<div class="m-b-15"></div>
+							<div class="row">
+								<div class="col-lg-12">
+									<div class="card">
+										<div class="card-header">
+											<strong>Create Vehicle Configuration</strong>
+										</div>
+										<div class="card-body card-block">
+
+
+											<div class="row form-group">
+												<div class="col col-md-2">
+													<label class=" form-control-label">Tire Condition</label>
+												</div>
+												<div class="col col-md-1">
+													<label class="switch switch-3d switch-primary mr-3">
+														<input type="checkbox" th:field="*{tireCondition}"
+														class="switch-input" checked="true"> <span
+														class="switch-label"></span> <span class="switch-handle"></span>
+													</label>
+												</div>
+												<div class="col col-md-9">
+													<label class=" form-control-label">The device shall
+														continuously monitor the tire pressure messages in order
+														to detect tire pressure alarm events.</label>
+												</div>
+											</div>
+											<div class="row form-group">
+												<div class="col col-md-2">
+													<label class=" form-control-label">Fuel Consumption</label>
+												</div>
+												<div class="col col-md-1">
+													<label class="switch switch-3d switch-secondary mr-3">
+														<input type="checkbox" th:field="*{fuelConsumption}"
+														class="switch-input" checked="true"> <span
+														class="switch-label"></span> <span class="switch-handle"></span>
+													</label>
+												</div>
+												<div class="col col-md-9">
+													<label class=" form-control-label">The device shall
+														acquire, record and maintain the fuel consumption value,
+														as received on the vehicle bus interface.</label>
+												</div>
+											</div>
+											<div class="row form-group">
+												<div class="col col-md-2">
+													<label class=" form-control-label">DTC</label>
+												</div>
+												<div class="col col-md-1">
+													<label class="switch switch-3d switch-success mr-3">
+														<input type="checkbox" th:field="*{dtc}"
+														class="switch-input" checked="true"> <span
+														class="switch-label"></span> <span class="switch-handle"></span>
+													</label>
+												</div>
+												<div class="col col-md-9">
+													<label class=" form-control-label">Diagnostic code
+														is considered to be active whenever at least one of
+														Malfunction Indicator Lamp Status, Red Stop Lamp Status,
+														Amber Warning Lamp Status, Protect Lamp Status is On.</label>
+												</div>
+											</div>
+											<div class="row form-group">
+												<div class="col col-md-2">
+													<label class=" form-control-label">Over Speed</label>
+												</div>
+												<div class="col col-md-1">
+													<label class="switch switch-3d switch-warning mr-3">
+														<input type="checkbox" th:field="*{overSpeed}"
+														class="switch-input" checked="true"> <span
+														class="switch-label"></span> <span class="switch-handle"></span>
+													</label>
+												</div>
+												<div class="col col-md-9">
+													<label class=" form-control-label">When the device
+														detects that the vehicle speed acquired from the vehicle
+														bus interface is higher than the over speed trigger an
+														event shall be stored in the database.</label>
+												</div>
+											</div>
+											<div class="row form-group">
+												<div class="col col-md-2">
+													<label class=" form-control-label">Over RPM</label>
+												</div>
+												<div class="col col-md-1">
+													<label class="switch switch-3d switch-info mr-3"> <input
+														type="checkbox" th:field="*{overRpm}" class="switch-input"
+														checked="true"> <span class="switch-label"></span>
+														<span class="switch-handle"></span>
+													</label>
+												</div>
+												<div class="col col-md-9">
+													<label class=" form-control-label">When the device
+														detects that the vehicle RPM acquired from the vehicle
+														interface is higher than the over RPM trigger an event
+														shall be stored in the database.</label>
+												</div>
+											</div>
+											<div class="row form-group">
+												<div class="col col-md-2">
+													<label class=" form-control-label">Harsh
+														Acceleration</label>
+												</div>
+												<div class="col col-md-1">
+													<label class="switch switch-3d switch-danger mr-3">
+														<input type="checkbox" th:field="*{harshAcceleration}"
+														class="switch-input" checked="true"> <span
+														class="switch-label"></span> <span class="switch-handle"></span>
+													</label>
+												</div>
+												<div class="col col-md-9">
+													<label class=" form-control-label">The device shall
+														calculate the vehicle acceleration based on the vehicle
+														speed data from two consecutive seconds. If the calculate
+														value is above the harsh acceleration limit an event shall
+														be stored in the database.</label>
+												</div>
+											</div>
+											<div class="row form-group">
+												<div class="col col-md-2">
+													<label class=" form-control-label">Harsh Breaking</label>
+												</div>
+												<div class="col col-md-1">
+													<label class="switch switch-3d switch-primary mr-3">
+														<input type="checkbox" th:field="*{harshBreak}"
+														class="switch-input" checked="true"> <span
+														class="switch-label"></span> <span class="switch-handle"></span>
+													</label>
+												</div>
+												<div class="col col-md-9">
+													<label class=" form-control-label">The device shall
+														calculate the vehicle acceleration based on the vehicle
+														speed data from two consecutive seconds. If the calculate
+														value is bellow the harsh braking an event shall be stored
+														in the database.</label>
+												</div>
+											</div>
+
+
+											<div class="row form-group">
+												<div class="col col-md-2">
+													<label class=" form-control-label">Online Report
+														Frequency</label>
+												</div>
+												<div class="col col-md-2">
+													<label style="width: 80px; height: 15px;"> <input
+														type="number" th:field="*{onlineFrequencyInterval}"
+														id="onlineRepFreq" placeholder="5-30" required
+														class="form-control" min="5" max="30"
+														oninput="if(this.value>30){this.value='30';}else if(this.value<5){this.value='5';}"
+														onkeydown="return false">
+													</label> <label for="onlineRepFreq"
+														class="pr-1  form-control-label">&nbsp; minutes</label>
+												</div>
+											</div>
+
+
+
+											<div class="row form-group">
+												<div class="col col-md-2">
+													<label for="textarea-input" class=" form-control-label">Description</label>
+												</div>
+												<div class="col col-md-3">
+													<textarea name="textarea-input" th:field="*{description}"
+														id="textarea-input" rows="5" placeholder="Description..."
+														class="form-control"></textarea>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+
+							</div>
+							<div class="row">
+								<div class="col-lg-12">
+									<input type="submit" class="btn-lg btn-primary"
+										style="float: right" />
+									<!--<a href="AddVehicle.html"><button type="button" class="btn-lg btn-primary" style="float: left">Back</button></a>-->
+								</div>
+							</div>
+							<p>&nbsp;</p>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+	<div th:replace="fragments/footer :: footer-scripts"></div>
+
+</body>
+
+</html>
+<!-- end document-->

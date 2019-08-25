@@ -1,0 +1,115 @@
+<div th:fragment="topbar">
+	<!-- HEADER DESKTOP-->
+	<header class="header-desktop">
+		<div class="section__content section__content--p30">
+			<div class="container-fluid">
+				<div class="header-wrap" style="float: right;">
+					<div class="header-button">
+						<div class="account-wrap">
+							<div class="account-item clearfix js-item-menu">
+								<div class="image">
+									<div th:if="${loggedInUser != null}">
+										<div th:if="${loggedInUserImage == null}">
+											<img src="/static/icons/nobody.jpg" alt="User image">
+										</div>
+										<div th:if="${loggedInUserImage != null}">
+											<img
+												th:attr="src=@{'data:image/jpeg;base64,'+${loggedInUserImage}}"
+												alt="User image">
+										</div>
+									</div>
+									<div th:if="${loggedInUser == null}">
+										<img src="/static/icons/nobody.jpg" alt="User image">
+									</div>
+								</div>
+								<div class="content">
+									<div th:if="${loggedInUser != null}">
+										<a class="js-acc-btn" href="#"
+											th:text="${loggedInUser.username}"></a>
+									</div>
+									<div th:if="${loggedInUser == null}">
+										<a class="js-acc-btn" href="#">-</a>
+									</div>
+								</div>
+								<div class="account-dropdown js-dropdown"
+									style="cursor: initial;">
+									<div class="info clearfix" style="pointer-events: none;">
+										<div class="image">
+											<div th:if="${loggedInUser != null}">
+												<div th:if="${loggedInUserImage == null}">
+													<img src="/static/icons/nobody.jpg" alt="User image">
+												</div>
+												<div th:if="${loggedInUserImage != null}">
+													<img
+														th:attr="src=@{'data:image/jpeg;base64,'+${loggedInUserImage}}"
+														alt="User image">
+												</div>
+											</div>
+											<div th:if="${loggedInUser == null}">
+												<img src="/static/icons/nobody.jpg" alt="User image">
+											</div>
+										</div>
+										<div class="content">
+											<div th:if="${loggedInUser != null}">
+												<h5 class="name">
+													<a href="#" th:text="${loggedInUser.username}"></a>
+												</h5>
+												<span class="email" th:text="${loggedInUser.email}"></span>
+											</div>
+											<div th:if="${loggedInUser == null}">
+												<h5 class="name">
+													<a href="#">-</a>
+												</h5>
+												<span class="email">-</span>
+											</div>
+										</div>
+									</div>
+									<div class="account-dropdown__body">
+										<div class="account-dropdown__item">
+											<a href="/account"><i class="zmdi zmdi-account"></i>Account</a>
+										</div>
+										<div class="account-dropdown__item">
+											<a href="#"> <i class="zmdi zmdi-invert-colors"></i>Dark Theme
+												&nbsp; <label class="switch switch-3d switch-secondary mr-3">
+													<input type="checkbox" id="themeSwitch"
+													onchange='handleCheckBoxChange(this);' class="switch-input">
+													<span class="switch-label"></span> <span
+													class="switch-handle"></span>
+											</label></a>
+										</div>
+									</div>
+									<div class="account-dropdown__footer">
+										<div class="account-dropdown__item"
+											style="background-color: #007bff;">
+
+											<!--  <a href="/logout"><i class="zmdi zmdi-power"></i>Logout</a>-->
+											<form th:action="@{/logout}" method="post">
+												<i
+													style="margin-left: 25px; background-color: #007bff; color: white;"
+													class="zmdi zmdi-power"></i> <input type="submit"
+													class="btn"
+													style="display: inline; color: white; background-color: #007bff; padding: 15px 25px; font-size: 14px;"
+													value="Logout" />
+											</form>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</header>
+	<!-- HEADER DESKTOP-->
+	<script>
+		function handleCheckBoxChange(checkbox) {
+			if (checkbox.checked == true) {
+				swapStyleSheet('/static/css/theme_dark.css');
+			} else {
+				swapStyleSheet('/static/css/theme.css');
+			}
+		}
+	</script>
+
+</div>

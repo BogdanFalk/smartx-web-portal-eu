@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta name="description" content="SmartX | Home">
+	<meta name="author" content="TTS4 development team">
+	<title>SmartX | Home</title>
+	<div th:replace="fragments/header :: header-css"></div>
+</head>
+
+<body onload="checkCookie()" class="animsition">
+	<div class="page-wrapper">
+
+		<div th:replace="fragments/mobile_menu :: mobile_menu"></div>
+		<div th:replace="fragments/menu_sidebar :: menu_sidebar"></div>
+
+		<!-- PAGE CONTAINER-->
+		<div class="page-container">
+			<div th:replace="fragments/topbar :: topbar"></div>
+
+			<!-- MAIN CONTENT-->
+			<div class="main-content">
+				<div class="section__content section__content--p30">
+					<div class="container-fluid">
+						<div class="row m-t-25">
+							<div class="col-sm-6 col-lg-4">
+								<div class="overview-item overview-item--c2">
+									<div class="overview__inner">
+										<div class="overview-box clearfix">
+											<div class="icon">
+												<i class="fas fa-truck"></i>
+											</div>
+											<div class="text">
+												<h2 th:text="${numberOfAvailableVehicles}"></h2>
+												<span>Available Vehicles</span>
+											</div>
+										</div>
+										<div class="overview-chart">
+											<canvas id="widgetChart2"></canvas>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-sm-6 col-lg-4">
+								<div class="overview-item overview-item--c1">
+									<div class="overview__inner">
+										<div class="overview-box clearfix">
+											<div class="icon">
+												<i class="fas fa-truck"></i>
+											</div>
+											<div class="text">
+												<h2 th:text="${numberOfUnavailableVehicles}"></h2>
+												<span>Unavailable Vehicles</span>
+											</div>
+										</div>
+										<div class="overview-chart">
+											<canvas id="widgetChart1"></canvas>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-sm-6 col-lg-4">
+								<div class="overview-item overview-item--c3">
+									<div class="overview__inner">
+										<div class="overview-box clearfix">
+											<div class="icon">
+												<i class="fas fa-truck"></i>
+											</div>
+											<div class="text">
+												<h2 th:text="${numberOfNotRegisteredVehicles}"></h2>
+												<span>Not registered vehicles</span>
+											</div>
+										</div>
+										<div class="overview-chart">
+											<canvas id="widgetChart3"></canvas>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-12">
+								<div class="card">
+									<div class="card-header">
+										<strong> Last positions from all vehicles </strong>
+									</div>
+									<div class="card-body card-block">
+										<div class="map-data m-b-40">
+											<div class="row">
+												<div class="col-md-9">
+													<!-- MAP DATA-->
+													<div class="map-data">
+														<div id="map-container-google-2"
+															class="z-depth-1-half map-container"
+															style="height: 250px"></div>
+													</div>
+													<!-- END MAP DATA-->
+												</div>
+												<!-- LEGEND-->
+												<div class="col-md-3">
+													<h3 class="title-3 m-b-5">Legend</h3>
+													<div class="card-body card-block"
+														style="text-align: justify; text-justify: inter-word;">
+														<p>Displayed on the map are the last received
+															positions of all the vehicles assigned to the logged in
+															user. The vehicles that have not been registered or
+															configured yet, as well as those with VIN inconsistency,
+															will not be displayed since they are not able to send any
+															data</p>
+													</div>
+													<div class="card-body card-block"
+														style="text-align: justify; text-justify: inter-word;">
+														<p>
+															<img
+																src="http://maps.google.com/mapfiles/ms/icons/green-dot.png">
+															The available vehicles' positions are displayed with a
+															green dot. These send "real-time" data, the positions
+															displayed corresponding to the most recent coordinates
+															received.
+														</p>
+													</div>
+													<div class="card-body card-block"
+														style="text-align: justify; text-justify: inter-word;">
+														<p>
+															<img
+																src="http://maps.google.com/mapfiles/ms/icons/blue-dot.png">
+															The unavailable vehicles' positions are displayed with a
+															blue dot. These are currently offline, the positions
+															displayed corresponding to the most recent coordinates
+															received before going offline.
+														</p>
+													</div>
+												</div>
+												<!-- END LEGEND-->
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div th:if="${availableVehiclesList.size() != 0}" class="row">
+							<div class="col-md-12 ">
+								<div class="card">
+									<div class="card-header">
+										<strong>Active Vehicles</strong>
+									</div>
+									<div class="card-body card-block">
+										<!-- DATA TABLE-->
+										<div class="table-responsive table-responsive-data3 m-b-15">
+											<div id="table-scroll" style="max-height: 400px">
+												<table class="table table-borderless table-data3">
+													<thead>
+														<tr>
+															<th class="fa-fw">Vehicle Number</th>
+															<th class="fa-fw">Vehicle VIN</th>
+															<th class="fa-fw">Vehicle Model</th>
+															<th class="fa-fw">Driver Username</th>
+															<th class="fa-fw">Actions</th>
+														</tr>
+													</thead>
+													<tbody>
+														<tr th:each="availableVehicle : ${availableVehiclesList}"
+															class="tr-shadow">
+															<td class="fa-fw"><a
+																th:text="${availableVehicle.vehicleNumber}"
+																th:href="@{'/vehicle/' + ${availableVehicle.id} + '?requestEvents=false&requestLogs=false'}"></a></td>
+															<td class="fa-fw" th:text="${availableVehicle.vin}"></td>
+															<td class="fa-fw">
+																<div
+																	th:if="${!#strings.isEmpty(availableVehicle.vehicleModel)}">
+																	<div th:text="${availableVehicle.vehicleModel}"></div>
+																</div>
+																<div
+																	th:if="${#strings.isEmpty(availableVehicle.vehicleModel)}">-</div>
+															</td>
+															<td class="fa-fw">
+																<div th:if="${availableVehicle.driver != null}">
+																	<a th:text="${availableVehicle.driver.driverUsername}"
+																		th:href="@{'/driver/' + ${availableVehicle.driver.id}}"></a>
+																</div>
+																<div th:if="${availableVehicle.driver == null}">-</div>
+															</td>
+															<td class="fa-fw">
+																<div class="table-data-feature justify-content-center">
+																	<a
+																		th:href="@{'/vehicle/edit/' + ${availableVehicle.id}}"
+																		class="item" data-toggle="tooltip"
+																		data-placement="top" title="Edit"> <i
+																		class="zmdi zmdi-edit"></i>
+																	</a>
+																</div>
+															</td>
+														</tr>
+													</tbody>
+												</table>
+											</div>
+											<!-- END DATA TABLE -->
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div th:if="${allVehiclesRecentEventsList.size() != 0}"
+							class="row">
+							<div class="col-md-12">
+								<div class="card">
+									<div class="card-header">
+										<strong>Most recent events</strong>
+									</div>
+									<div class="card-body card-block">
+										<!-- DATA TABLE-->
+										<div class="table-responsive table-responsive-data3 m-b-15">
+											<div id="table-scroll" style="max-height: 400px">
+												<table class="table table-borderless table-data3">
+													<thead>
+														<tr>
+															<th class="fa-fw">Vehicle Number</th>
+															<th class="fa-fw">Date</th>
+															<th class="fa-fw">Type</th>
+															<th class="fa-fw">Latitude</th>
+															<th class="fa-fw">Longitude</th>
+														</tr>
+													</thead>
+													<tbody>
+														<tr
+															th:each="vehiclesRecentEvent : ${allVehiclesRecentEventsList}"
+															class="tr-shadow" style="height: 54px;">
+															<td class="fa-fw"
+																th:text="${vehiclesRecentEvent.vehicleNumber}"></td>
+															<td class="fa-fw"
+																th:text="${#temporals.format(vehiclesRecentEvent.localDateTime,'dd-MM-yyyy HH:mm')}"></td>
+															<td class="fa-fw"
+																th:text="${vehiclesRecentEvent.typeName}"></td>
+															<td class="fa-fw">
+																<div th:if="${vehiclesRecentEvent.latitude != -1}">
+																	<div th:text="${vehiclesRecentEvent.latitude}"></div>
+																</div>
+																<div th:if="${vehiclesRecentEvent.latitude == -1}">NA</div>
+															</td>
+															<td class="fa-fw">
+																<div th:if="${vehiclesRecentEvent.longitude != -1}">
+																	<div th:text="${vehiclesRecentEvent.longitude}"></div>
+																</div>
+																<div th:if="${vehiclesRecentEvent.longitude == -1}">NA</div>
+															</td>
+														</tr>
+													</tbody>
+												</table>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<p>&nbsp;</p>
+			</div>
+			<!-- END MAIN CONTENT-->
+			<!-- END PAGE CONTAINER-->
+		</div>
+	</div>
+
+	<div th:replace="fragments/footer :: footer-scripts"></div>
+	<!--Save the coordinates received from controller -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+		var coordinates = /*[[${gmapsVehicleTrackings}]]*/null;
+		/*]]>*/
+	</script>
+
+	<script>
+		// Initialize and add the map
+		function initMap() {
+			var map = new google.maps.Map(document
+					.getElementById('map-container-google-2'), {
+				zoom : 8,
+				center : new google.maps.LatLng(46.18333, 21.31667),
+				mapTypeId : google.maps.MapTypeId.ROADMAP
+			});
+
+			for (i = 0; i < coordinates.length; i++) {
+				var point = {
+					lat : coordinates[i].latitude,
+					lng : coordinates[i].longitude
+				};
+				if (coordinates[i].status === "AVAILABLE") {
+					console.log("Adding point with coords: "
+							+ coordinates[i].latitude + ", "
+							+ coordinates[i].longitude + " and status: "
+							+ coordinates[i].status);
+					new google.maps.Marker(
+							{
+								position : new google.maps.LatLng(point),
+								map : map,
+								title : 'Vehicle status: ' + 'AVAILABLE',
+								icon : {
+									url : "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
+								}
+							});
+				} else if (coordinates[i].status === "UNAVAILABLE") {
+					console.log("Adding point with coords: "
+							+ coordinates[i].latitude + ", "
+							+ coordinates[i].longitude + " and status: "
+							+ coordinates[i].status);
+					new google.maps.Marker(
+							{
+								position : new google.maps.LatLng(point),
+								map : map,
+								title : 'Vehicle status: ' + 'UNAVAILABLE',
+								icon : {
+									url : "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+								}
+							});
+				} else {
+					// Other status.
+					console.log("Point with coords: " + coordinates[i].latitude
+							+ ", " + coordinates[i].longitude + " and status: "
+							+ coordinates[i].status
+							+ "was NOT added to the map.");
+				}
+			}
+		}
+	</script>
+	<!--Load the API from the specified URL
+    * The async attribute allows the browser to render the page while the API loads
+    * The key parameter will contain your own API key (which is not needed for this tutorial)
+    * The callback parameter executes the initMap() function
+    -->
+	<script async defer
+		src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBk9HaeIwG4T1W_HrioY2XYNRe9Da9wRqg&libraries=geometry&callback=initMap"></script>
+</body>
+</html>

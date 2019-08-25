@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport"
+		content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta name="description" content="SmartX | Edit Account">
+	<meta name="author" content="TTS4 development team">
+	<title>SmartX | Edit Account</title>
+	<div th:replace="fragments/header :: header-css"></div>
+</head>
+
+<body onload="checkCookie()" class="animsition">
+	<div class="page-wrapper">
+		<div th:replace="fragments/mobile_menu :: mobile_menu"></div>
+		<div th:replace="fragments/menu_sidebar :: menu_sidebar"></div>
+
+		<!-- PAGE CONTAINER-->
+		<div class="page-container">
+
+			<div th:replace="fragments/topbar :: topbar"></div>
+
+			<!-- MAIN CONTENT-->
+			<div class="main-content">
+				<div class="section__content section__content--p30">
+					<form th:object="${editedAccount}" th:action="@{/account/edit}"
+						enctype="multipart/form-data" method="POST">
+						<div class="container-fluid">
+							<div class="row">
+								<div class="col-md-12">
+									<div class="overview-wrap">
+										<h2 class="title-2">Edit Account</h2>
+									</div>
+								</div>
+							</div>
+							<div class="m-b-15"></div>
+							<div class="row">
+								<div class="col-lg-8">
+									<div class="card">
+										<div class="card-header">
+											<strong style="float: left;">Company Details</strong>
+										</div>
+										<div class="card-body card-block">
+
+											<div class="form-group">
+												<label for="vat" class=" form-control-label">Company
+													Name</label> <input type="text" id="companyName"
+													th:value="*{companyName}" th:field="*{companyName}"
+													class="form-control">
+											</div>
+											<div class="form-group">
+												<label for="dot" class=" form-control-label">Company
+													DOT number</label> <input type="text" id="companyDot"
+													th:value="*{companyDotNumber}"
+													th:field="*{companyDotNumber}" class="form-control">
+											</div>
+											<div class="form-group">
+												<label for="address" class=" form-control-label">Company
+													Address</label> <input type="text" id="companyAddress"
+													th:value="*{companyAddress}" th:field="*{companyAddress}"
+													class="form-control">
+											</div>
+											<div class="form-group">
+												<label for="street" class=" form-control-label">Owner
+													e-mail</label> <input type="text" id="ownerEmail"
+													th:value="*{email}" class="form-control" disabled>
+											</div>
+											<div class="form-group">
+												<label for="street" class=" form-control-label">Number
+													Of Vehicles</label> <input type="text" id="numberOfVehicles"
+													th:value="${numberOfVehicles}" class="form-control"
+													disabled>
+											</div>
+											<div class="form-group">
+												<label for="street" class=" form-control-label">Number
+													Of Drivers</label> <input type="text" id="numberOfDrivers"
+													th:value="${numberOfDrivers}" class="form-control" disabled>
+											</div>
+
+										</div>
+									</div>
+								</div>
+								<div class="col-lg-4">
+									<div class="card" style="height: 434px;">
+										<div class="card-header">
+											<strong class="card-title mb-3">User Image</strong>
+										</div>
+										<div class="card-body">
+											<div class="mx-auto d-block"
+												style="max-height: 100%; overflow: hidden;">
+												<div th:if="${userImage != null}"
+													style="text-align: center;">
+													<img class="rounded-circle mx-auto d-block"
+														th:attr="src=@{'data:image/jpeg;base64,'+${userImage}}"
+														alt="User image" style="height: 249px; object-fit: cover;">
+												</div>
+												<div th:if="${userImage == null}"
+													style="text-align: center;">
+													<img class="rounded-circle mx-auto d-block"
+														src="/static/icons/nobody.jpg" alt="User image"
+														style="height: 249px; object-fit: cover;">
+												</div>
+												<h5 class="text-sm-center mt-2 mb-1"
+													th:text="${editedAccount.username}"></h5>
+												<p>&nbsp;</p>
+												<div style="white-space: nowrap;">
+													<input type="button" class="btn btn-primary" id="get_file"
+														value="Choose File"> <input type="file"
+														id="my_file" name="userImage" accept=".jpg">
+													<div id="customfileupload" style="pointer-events: none"></div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-lg-12">
+								<input type="submit" class="btn-lg btn-primary"
+									value="Update Account" style="float: right" />
+							</div>
+						</div>
+						<p>&nbsp;</p>
+					</form>
+				</div>
+			</div>
+		</div>
+		<!-- END MAIN CONTENT-->
+		<!-- END PAGE CONTAINER-->
+	</div>
+	<div th:replace="fragments/footer :: footer-scripts"></div>
+	<script>
+		document.getElementById('get_file').onclick = function() {
+			document.getElementById('my_file').click();
+		};
+		$('input[type=file]')
+				.change(
+						function(e) {
+							var fullPath = document.getElementById('my_file').value;
+							if (fullPath) {
+								var startIndex = (fullPath.indexOf('\\') >= 0 ? fullPath
+										.lastIndexOf('\\')
+										: fullPath.lastIndexOf('/'));
+								var filename = fullPath.substring(startIndex);
+								if (filename.indexOf('\\') === 0
+										|| filename.indexOf('/') === 0) {
+									filename = filename.substring(1);
+								}
+							}
+							$('#customfileupload').html(filename);
+						});
+	</script>
+</body>
+
+</html>
+<!-- end document-->

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta name="description" content="SmartX | Manage Drivers">
+	<meta name="author" content="TTS4 development team">
+	<title>SmartX | Drivers</title>
+	<div th:replace="fragments/header :: header-css"></div>
+</head>
+
+<body onload="checkCookie()" class="animsition">
+	<div class="page-wrapper">
+		<div th:replace="fragments/mobile_menu :: mobile_menu"></div>
+		<div th:replace="fragments/menu_sidebar :: menu_sidebar"></div>
+
+		<!-- PAGE CONTAINER-->
+		<div class="page-container">
+			<div th:replace="fragments/topbar :: topbar"></div>
+
+			<div class="main-content">
+				<div class="section__content section__content--p30">
+					<div class="container-fluid">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="overview-wrap">
+									<h2 class="title-2">Manage Drivers</h2>
+								</div>
+							</div>
+						</div>
+						<div class="m-b-15"></div>
+						<div class="row">
+							<div class="col-md-12 fa-pull-center">
+								<!-- DATA TABLE -->
+								<div class="table-data__tool-left m-b-15"></div>
+								<div th:if="${not #lists.isEmpty(tableFormList)}">
+									<div class="table-responsive table-responsive-data3 m-b-15">
+										<div id="table-scroll" style="max-height: 400px">
+											<table class="table table-borderless table-data3">
+												<thead>
+													<tr>
+														<th class="fa-fw">Driver Username</th>
+														<th class="fa-fw">Driver Full Name</th>
+														<th class="fa-fw">License Number</th>
+														<th class="fa-fw">Vehicle Number</th>
+														<th class="fa-fw">Serial Number</th>
+														<th class="fa-fw">Vehicle Status</th>
+														<th class="fa-fw">Actions</th>
+													</tr>
+												</thead>
+
+												<tbody>
+
+													<tr th:each="tableForm : ${tableFormList}"
+														class="tr-shadow">
+														<td class="fa-fw"><a
+															th:text="${tableForm.driverUsername}"
+															th:href="@{'/driver/' + ${tableForm.driverId}}"></a></td>
+														<td class="fa-fw" th:text="${tableForm.fullName}"></td>
+														<td class="fa-fw" th:text="${tableForm.licenseNumber}"></td>
+														<td class="fa-fw">
+															<div
+																th:if="${!#strings.isEmpty(tableForm.vehicleNumber)}">
+																<a th:text="${tableForm.vehicleNumber}"
+																	th:href="@{'/vehicle/' + ${tableForm.vehicleId} + '?requestEvents=false&requestLogs=false'}"></a>
+															</div>
+															<div th:if="${#strings.isEmpty(tableForm.vehicleNumber)}">-</div>
+														</td>
+														<td class="fa-fw">
+															<div
+																th:if="${!#strings.isEmpty(tableForm.vehicleDeviceSerialNumber)}">
+																<div th:text="${tableForm.vehicleDeviceSerialNumber}"></div>
+															</div>
+															<div
+																th:if="${#strings.isEmpty(tableForm.vehicleDeviceSerialNumber)}">-</div>
+														</td>
+														<td class="fa-fw">
+															<div
+																th:if="${!#strings.isEmpty(tableForm.vehicleStatus)}">
+																<div th:switch="${tableForm.vehicleStatus}">
+																	<button type="button" th:case="'AVAILABLE'"
+																		class="btn btn-success btn-sm btn-block"
+																		style="pointer-events: none;">Available</button>
+																	<button type="button" th:case="'UNAVAILABLE'"
+																		class="btn btn-info btn-sm btn-block"
+																		style="pointer-events: none;">Unavailable</button>
+																	<button type="button" th:case="'CONFIGURATION PENDING'"
+																		class="btn btn-warning btn-sm btn-block"
+																		style="pointer-events: none;">Configuration
+																		pending</button>
+																	<button type="button" th:case="'NOT REGISTERED'"
+																		class="btn btn-secondary btn-sm btn-block"
+																		style="pointer-events: none;">Not registered</button>
+																	<button type="button" th:case="'VIN MISMATCH'"
+																		class="btn btn-danger btn-sm btn-block"
+																		style="pointer-events: none;">VIN mismatch</button>
+																</div>
+															</div>
+															<div th:if="${#strings.isEmpty(tableForm.vehicleStatus)}">-</div>
+														</td>
+														<td class="fa-fw">
+															<div class="table-data-feature justify-content-center">
+
+																<a th:href="@{'/driver/edit/' + ${tableForm.driverId}}"
+																	class="item" data-toggle="tooltip" data-placement="top"
+																	title="Edit"> <i class="zmdi zmdi-edit"></i>
+																</a> <span data-toggle="tooltip" data-placement="top"
+																	title="Delete">
+																	<button type="button" class="item" data-keyboard="true"
+																		data-toggle="modal" data-backdrop="false"
+																		th:attr="data-target='#myModal'+${tableForm.driverId}">
+																		<i class="zmdi zmdi-delete"></i>
+																	</button>
+																</span>
+
+																<!-- The Modal -->
+																<div class="modal fade" tabindex="-1" role="dialog"
+																	aria-labelledby="myModalLabel" aria-hidden="true"
+																	th:id="myModal+${tableForm.driverId}">
+																	<div class="modal-dialog modal-dialog-centered"
+																		role="document">
+																		<div class="modal-content">
+
+																			<!-- Modal Header -->
+																			<div class="modal-header">
+																				<h3 class="modal-title" id="myModalLabel">Warning</h3>
+																				<button type="button" class="close"
+																					data-dismiss="modal" aria-label="Close">
+																					<span aria-hidden="true">&times;</span>
+																				</button>
+																			</div>
+
+																			<div class="modal-body">
+																				<p>This action will permanently delete all
+																					information related to the selected driver. Are you
+																					sure you wish to proceed?</p>
+																			</div>
+
+																			<!-- Modal footer -->
+																			<div class="modal-footer">
+																				<button type="button" class="btn btn-secondary"
+																					data-dismiss="modal">Close</button>
+																				<a
+																					th:href="@{'/driver/delete/'+${tableForm.driverId}}"><button
+																						type="button" class="btn btn-primary">Yes</button></a>
+																			</div>
+																		</div>
+																	</div>
+																</div>
+																<!-- End Modal -->
+
+															</div>
+														</td>
+													</tr>
+												</tbody>
+											</table>
+										</div>
+									</div>
+								</div>
+								<!-- END DATA TABLE -->
+								<div class="row">
+									<div class="col-lg-12">
+										<p>&nbsp;</p>
+										<a href="/driver/add"><button type="button"
+												class="btn btn-primary" style="float: left">
+												<i class="fa fa-plus"></i>&nbsp; Add Driver
+											</button></a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- END MAIN CONTENT-->
+			<!-- END PAGE CONTAINER-->
+		</div>
+
+	</div>
+
+	<div th:replace="fragments/footer :: footer-scripts"></div>
+</body>
+
+</html>
+<!-- end document-->

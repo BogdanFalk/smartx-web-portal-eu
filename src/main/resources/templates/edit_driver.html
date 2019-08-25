@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport"
+		content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta name="description" content="SmartX | Edit Driver">
+	<meta name="author" content="TTS4 development team">
+	<title>SmartX | Edit Driver</title>
+	<div th:replace="fragments/header :: header-css"></div>
+</head>
+
+<body onload="checkCookie()" class="animsition">
+	<div class="page-wrapper">
+		<div th:replace="fragments/mobile_menu :: mobile_menu"></div>
+		<div th:replace="fragments/menu_sidebar :: menu_sidebar"></div>
+
+		<!-- PAGE CONTAINER-->
+		<div class="page-container">
+			<div th:replace="fragments/topbar :: topbar"></div>
+
+			<!-- MAIN CONTENT-->
+			<div class="main-content">
+				<div class="section__content section__content--p30">
+					<form th:object="${editedDriver}"
+						th:action="@{/driver/edit/{id}(id=${editedDriver.id})}"
+						enctype="multipart/form-data" method="POST">
+						<div class="container-fluid">
+							<div class="row">
+								<div class="col-md-12">
+									<div class="overview-wrap">
+										<h2 class="title-2">Edit Driver Details</h2>
+									</div>
+								</div>
+							</div>
+							<div class="m-b-15"></div>
+							<div class="row">
+
+								<div class="col-lg-6">
+									<div class="card">
+										<div class="card-header">
+											<strong style="float: left;">Driver Information</strong>
+										</div>
+										<div class="card-body card-block">
+
+											<div class="form-group">
+												<label for="username" class=" form-control-label">Driver
+													Username</label> <input type="text" th:value="*{driverUsername}"
+													th:field="*{driverUsername}" class="form-control"
+													maxlength="18" required disabled>
+											</div>
+											<div class="form-group">
+												<label for="name" class=" form-control-label">Full
+													Name</label> <input type="text" th:value="*{fullName}"
+													th:field="*{fullName}" class="form-control" required>
+											</div>
+											<div class="form-group">
+												<label for="license" class=" form-control-label">License
+													Number</label> <input type="text" th:value="*{licenseNumber}"
+													th:field="*{licenseNumber}" class="form-control" required>
+											</div>
+											<div class="form-group">
+												<label for="address" class=" form-control-label">Address</label>
+												<input type="text" th:value="*{address}"
+													th:field="*{address}" class="form-control">
+											</div>
+											<div class="form-group">
+												<label for="phone" class=" form-control-label">Phone
+													Number</label> <input type="text" th:value="*{phoneNumber}"
+													th:field="*{phoneNumber}" class="form-control">
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="col-lg-6">
+									<div class="card" style="height: 254px;">
+										<div class="card-header">
+											<strong>Driver Image</strong>
+											<button disabled type="button" class="btn-sm btn-link"
+												style="float: right;">&nbsp;</button>
+										</div>
+										<div class="card-body card-block" style="overflow: hidden;">
+											<div class="containerimg"
+												style="max-height: 100%; overflow: hidden; text-align: center;">
+												<img th:if="${driverImage != null}"
+													th:attr="src=@{'data:image/jpeg;base64,'+${driverImage}}"
+													alt="Driver image" style="height: 99px; object-fit: cover;">
+												<img th:if="${driverImage == null}"
+													src="/static/icons/nobody.jpg" alt="Driver image"
+													style="height: 99px; object-fit: cover;">
+											</div>
+											<p>&nbsp;</p>
+											<div style="white-space: nowrap;">
+												<input type="button" class="btn btn-primary" id="get_file"
+													value="Choose File"> <input type="file"
+													id="my_file" name="driverImage" accept=".jpg">
+												<div id="customfileupload" style="pointer-events: none"></div>
+											</div>
+										</div>
+									</div>
+									<div class="card">
+										<div class="card-header">
+											<strong>Vehicle</strong>
+										</div>
+										<div class="card-body card-block">
+											<div th:if="${assignedVehicle != null}">
+												<div class="alert alert-primary" role="alert"
+													style="overflow: hidden; white-space: nowrap;">
+													<strong> Corresponding Vehicle:&nbsp; <span
+														style="display: inline"
+														th:text="${assignedVehicle.vehicleNumber}"></span>
+													</strong>
+												</div>
+											</div>
+											<div th:if="${assignedVehicle == null}">
+												<div class="alert alert-primary" role="alert"
+													style="overflow: hidden; white-space: nowrap;">
+													<strong> Corresponding Vehicle:&nbsp; - </strong>
+												</div>
+											</div>
+											<div>
+												<label for="select" class=" form-control-label">&nbsp;
+													Change assigned vehicle?</label>
+											</div>
+											<tr class="spacer"></tr>
+											<div class="row form-group">
+												<div class="col-12 col-md-6">
+													<div th:if="${assignedVehicle != null}">
+														<select class="form-control" name="selectedVehicleId"
+															id="selectedVehicleId">
+															<option value="0">No vehicle</option>
+															<option
+																th:each="unassignedVehicle : ${unassignedVehicles}"
+																th:value="${unassignedVehicle.id}"
+																th:text="${unassignedVehicle.vehicleNumber}"
+																th:selected="(${unassignedVehicle.id} == ${selectedVehicleId})"></option>
+														</select>
+													</div>
+
+													<div th:if="${assignedVehicle == null}">
+														<select class="form-control" name="selectedVehicleId"
+															id="selectedVehicleId">
+															<option value="0">No vehicle</option>
+															<option
+																th:each="unassignedVehicle : ${unassignedVehicles}"
+																th:value="${unassignedVehicle.id}"
+																th:text="${unassignedVehicle.vehicleNumber}"></option>
+														</select>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-lg-12">
+								<input type="submit" class="btn-lg btn-primary"
+									value="Update Driver" style="float: right" />
+							</div>
+						</div>
+						<p>&nbsp;</p>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div th:replace="fragments/footer :: footer-scripts"></div>
+	<script>
+		document.getElementById('get_file').onclick = function() {
+			document.getElementById('my_file').click();
+		};
+		$('input[type=file]')
+				.change(
+						function(e) {
+							var fullPath = document.getElementById('my_file').value;
+							if (fullPath) {
+								var startIndex = (fullPath.indexOf('\\') >= 0 ? fullPath
+										.lastIndexOf('\\')
+										: fullPath.lastIndexOf('/'));
+								var filename = fullPath.substring(startIndex);
+								if (filename.indexOf('\\') === 0
+										|| filename.indexOf('/') === 0) {
+									filename = filename.substring(1);
+								}
+							}
+							$('#customfileupload').html(filename);
+						});
+	</script>
+
+</body>
+
+</html>
+<!-- end document-->

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="description" content="SmartX | Vehicle Tracking">
+<meta name="author" content="TTS4 development team">
+<title>SmartX | Vehicle Tracking</title>
+<div th:replace="fragments/header :: header-css"></div>
+</head>
+
+<body onload="checkCookie()" class="animsition">
+	<div class="page-wrapper">
+		<div th:replace="fragments/mobile_menu :: mobile_menu"></div>
+		<div th:replace="fragments/menu_sidebar :: menu_sidebar"></div>
+
+		<!-- PAGE CONTAINER-->
+		<div class="page-container">
+			<div th:replace="fragments/topbar :: topbar"></div>
+
+			<!-- MAIN CONTENT-->
+			<div class="main-content">
+				<div class="section__content section__content--p30">
+					<div class="container-fluid">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="overview-wrap">
+									<h2 class="title-2">Vehicle Tracking</h2>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-6">
+								<form th:object="${newFilter}"
+									th:action="@{/vehicle/tracking/{id}(id=${vehicleId})}"
+									method="POST">
+									<div>
+										<p>&nbsp;</p>
+										<label for="date">Select date: &nbsp;</label> <input
+											type="date" id="date" th:value="${currentDate}"
+											th:field="*{date}" th:min="${minDate}" th:max="${maxDate}">
+										<button type="submit" class="btn-sm btn-primary">Load</button>
+									</div>
+								</form>
+							</div>
+						</div>
+
+						<div class="row justify-content-center">
+							<div class="col-md-12">
+								<p>&nbsp;</p>
+								<!-- MAP DATA-->
+								<div class="map-data m-b-40">
+									<div id="map-container-google-2"
+										class="z-depth-1-half map-container" style="height: 250px"></div>
+								</div>
+								<!-- END MAP DATA-->
+							</div>
+
+						</div>
+
+						<div class="row">
+							<div class="col-md-12">
+								<div th:if="${not #lists.isEmpty(vehicleTrackingTableFormList)}">
+									<div class="card">
+										<div class="card-header">
+											<strong>Vehicle Tracking Events</strong>
+										</div>
+										<div class="card-body card-block">
+											<!-- DATA TABLE-->
+											<div class="table-responsive table-responsive-data3 m-b-15">
+												<div id="table-scroll" style="max-height: 400px">
+													<table class="table table-borderless table-data3">
+														<thead>
+															<tr>
+																<th class="fa-fw">Date</th>
+																<th class="fa-fw">Latitude</th>
+																<th class="fa-fw">Longitude</th>
+																<th class="fa-fw">Heading</th>
+															</tr>
+														</thead>
+														<tbody>
+															<tr
+																th:each="vehicleTracking : ${vehicleTrackingTableFormList}">
+																<td class="fa-fw"
+																	th:text="${#temporals.format(vehicleTracking.convertedTimestamp,'dd-MM-yyyy HH:mm')}"></td>
+																<td class="fa-fw" th:text="${vehicleTracking.convertedLatitude}"></td>
+																<td class="fa-fw" th:text="${vehicleTracking.convertedLongitude}"></td>
+																<td class="fa-fw" th:text="${vehicleTracking.heading}"></td>
+															</tr>
+														</tbody>
+													</table>
+												</div>
+											</div>
+										</div>
+									</div>
+
+									<!-- END DATA TABLE-->
+								</div>
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+			<!-- END MAIN CONTENT-->
+			<!-- END PAGE CONTAINER-->
+		</div>
+
+	</div>
+
+	<div th:replace="fragments/footer :: footer-scripts"></div>
+
+	<!--Save the coordinates received from controller -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+		var coordinates = /*[[${listOfCoordinates}]]*/null;
+		/*]]>*/
+	</script>
+
+	<script>
+		// Initialize and add the map
+		function initMap() {
+
+			var map = new google.maps.Map(document
+					.getElementById('map-container-google-2'), {
+				zoom : 8,
+				center : new google.maps.LatLng(46.18333, 21.31667),
+				//mapTypeId: google.maps.MapTypeId.ROADMAP
+				mapTypeId : 'terrain'
+			});
+
+			// This code can be used to show multiple markers on the map.
+			/*
+			var infowindow = new google.maps.InfoWindow();
+			var marker, i;
+			for (i = 0; i < coordinates.length; i++) {  
+			  	marker = new google.maps.Marker({
+			    position: new google.maps.LatLng(coordinates[i].latitude, coordinates[i].longitude),
+			    map: map
+			  });
+
+			   google.maps.event.addListener(marker, 'click', (function(marker, i) {
+			    return function() {
+			      infowindow.setContent(coordinates[i].latitude.toString() + ', ' + coordinates[i].longitude.toString());
+			      infowindow.open(map, marker);
+			    }
+			  })(marker, i)); 
+			} */
+
+			var route = [];
+			for (i = 0; i < coordinates.length; i++) {
+				var point = {
+					lat : coordinates[i].latitude,
+					lng : coordinates[i].longitude
+				};
+				route.push(point);
+			}
+
+			var routePath = new google.maps.Polyline({
+				path : route,
+				geodesic : true,
+				strokeColor : '#FF0000',
+				strokeOpacity : 1.0,
+				strokeWeight : 4
+			});
+
+			var distanceInMeters = google.maps.geometry.spherical
+					.computeLength(routePath.getPath());
+
+			var markerStart = new google.maps.Marker({
+				position : new google.maps.LatLng(coordinates[0].latitude,
+						coordinates[0].longitude),
+				map : map,
+				title : 'Start Point. Click for more information...'
+			});
+
+			var markerEnd = new google.maps.Marker({
+				position : new google.maps.LatLng(
+						coordinates[coordinates.length - 1].latitude,
+						coordinates[coordinates.length - 1].longitude),
+				map : map,
+				title : 'End Point. Click for more information...'
+			});
+
+			var infoWindowStart = new google.maps.InfoWindow({
+				content : '... more information :)'
+			});
+			google.maps.event.addListener(markerStart, 'click', function() {
+				infoWindowStart.open(map, markerStart);
+			});
+
+			var infoWindowEnd = new google.maps.InfoWindow({
+				content : 'Trip endpoint.' + "<br/>" + 'Trip was ' + "<b>"
+						+ (distanceInMeters / 1000).toFixed(3) + 'km' + "</b>"
+						+ ' long.'
+			});
+			google.maps.event.addListener(markerEnd, 'click', function() {
+				infoWindowEnd.open(map, markerEnd);
+			});
+
+			routePath.setMap(map);
+			// Add a click event listener and show some info about the route
+			google.maps.event.addListener(routePath, 'click', function() {
+				alert("This is the route for vehicle with number: "
+						+ coordinates[0].vehicleNumber);
+			});
+		}
+	</script>
+	<!--Load the API from the specified URL
+    * The async attribute allows the browser to render the page while the API loads
+    * The key parameter will contain your own API key (which is not needed for this tutorial)
+    * The callback parameter executes the initMap() function
+    -->
+	<script async defer
+		src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBk9HaeIwG4T1W_HrioY2XYNRe9Da9wRqg&libraries=geometry&callback=initMap">
+		
+	</script>
+
+</body>
+
+</html>
+<!-- end document-->
